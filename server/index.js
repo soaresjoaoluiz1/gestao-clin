@@ -36,7 +36,7 @@ const PORT = 3005
 
 // Strip /gestao-clin prefix so /gestao-clin/api/* maps to /api/*
 app.use((req, res, next) => {
-  if (req.url.startsWith('/gestao-clin/api/')) req.url = req.url.slice(4)
+  if (req.url.startsWith('/gestao-clin/api/')) req.url = req.url.slice(12)
   else if (req.url === '/gestao-clin/api') req.url = '/api'
   next()
 })
