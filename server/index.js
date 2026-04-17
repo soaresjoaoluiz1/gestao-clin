@@ -47,7 +47,10 @@ app.use((req, res, next) => {
 // Public routes (no auth)
 app.use('/api/auth', authRoutes)
 app.use('/api/webhooks', webhookRoutes)
-app.use('/api/booking', bookingRoutes)
+app.use('/api/booking/t', bookingRoutes)  // public: /api/booking/t/:token/*
+
+// Authenticated booking routes (generate links, list links)
+app.use('/api/booking', authenticate, scopeToAccount, bookingRoutes)
 
 // Protected routes (all require auth)
 app.use('/api/accounts', authenticate, accountRoutes)

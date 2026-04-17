@@ -23,6 +23,7 @@ import Agenda from './pages/Agenda'
 import AnamnesePage from './pages/Anamnese'
 import MeusHorarios from './pages/MeusHorarios'
 import Booking from './pages/Booking'
+import BookingLinks from './pages/BookingLinks'
 import AdminClients from './pages/admin/Clients'
 import AdminClientDetail from './pages/admin/ClientDetail'
 import AdminGlobalDashboard from './pages/admin/GlobalDashboard'
@@ -84,6 +85,7 @@ function AppRoutes() {
           {isProfissional && (
             <Route path="/meus-horarios" element={<MeusHorarios />} />
           )}
+          <Route path="/booking-links" element={<BookingLinks />} />
 
           <Route path="*" element={<Navigate to={homeRoute} />} />
         </Routes>
@@ -98,7 +100,7 @@ function RootRouter() {
   // Check if current path is public booking — render without auth
   const path = window.location.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '')
   if (path.startsWith('/agendar/') || path.startsWith('/agendar')) {
-    return <Routes><Route path="/agendar/:slug" element={<Booking />} /></Routes>
+    return <Routes><Route path="/agendar/:token" element={<Booking />} /></Routes>
   }
   return <AuthProvider><AppRoutes /></AuthProvider>
 }

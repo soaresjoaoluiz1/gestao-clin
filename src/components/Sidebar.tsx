@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Kanban, Users, MessageCircle, UserCog, GitBranch,
   Plug, Settings, Building2, LogOut, UsersRound, Menu, X,
   ListOrdered, MessageSquarePlus, ClipboardList, Rocket, ListTodo,
-  Calendar, FileText, Clock,
+  Calendar, FileText, Clock, Link,
 } from 'lucide-react'
 
 export default function Sidebar() {
@@ -114,6 +114,11 @@ export default function Sidebar() {
           {(isGerente || isAdmin || isProfissional) && (
             <NavLink to="/anamnese" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={closeMobile}>
               <FileText size={16} /> Anamnese
+            </NavLink>
+          )}
+          {(isGerente || isAdmin || !isProfissional) && (
+            <NavLink to="/booking-links" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={closeMobile}>
+              <Link size={16} /> Links de Agendamento
             </NavLink>
           )}
           {isProfissional && (

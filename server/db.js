@@ -414,6 +414,23 @@ db.exec(`
     FOREIGN KEY (professional_id) REFERENCES users(id),
     FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
   );
+  CREATE TABLE IF NOT EXISTS booking_links (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id      INTEGER NOT NULL,
+    lead_id         INTEGER NOT NULL,
+    professional_id INTEGER NOT NULL,
+    token           TEXT NOT NULL UNIQUE,
+    status          TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'used', 'expired')),
+    created_by      INTEGER,
+    used_at         TEXT,
+    appointment_id  INTEGER,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
+    FOREIGN KEY (professional_id) REFERENCES users(id),
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id)
+  );
 `)
 
 // Seed super_admin if not exists
