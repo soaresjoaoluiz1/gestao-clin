@@ -366,12 +366,12 @@ addColumnIfNotExists('leads', 'archived_at', 'TEXT')
 addColumnIfNotExists('leads', 'has_new_after_archive', 'INTEGER NOT NULL DEFAULT 0')
 
 // Seed super_admin if not exists
-const adminExists = db.prepare('SELECT id FROM users WHERE email = ?').get('admin@drosagencia.com.br')
+const adminExists = db.prepare('SELECT id FROM users WHERE email = ?').get('admin@gestaoclin.com.br')
 if (!adminExists) {
   db.prepare(`
     INSERT INTO users (name, email, password, role, account_id) VALUES (?, ?, ?, 'super_admin', NULL)
-  `).run('Dros Admin', 'admin@drosagencia.com.br', bcrypt.hashSync('dros2026', 10))
-  console.log('[DB] Super admin created: admin@drosagencia.com.br')
+  `).run('Admin', 'admin@gestaoclin.com.br', bcrypt.hashSync('admin2026', 10))
+  console.log('[DB] Super admin created: admin@gestaoclin.com.br')
 }
 
 console.log('[DB] SQLite ready at', dbPath)
