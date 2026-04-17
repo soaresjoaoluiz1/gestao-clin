@@ -81,7 +81,7 @@ export default function AdminUsers() {
             <div className="form-group"><label>Senha</label><input className="input" type="password" value={newUser.password} onChange={e => setNewUser(p => ({ ...p, password: e.target.value }))} /></div>
             <div className="form-group"><label>Role</label>
               <select className="select" value={newUser.role} onChange={e => setNewUser(p => ({ ...p, role: e.target.value }))}>
-                <option value="super_admin">Super Admin</option><option value="gerente">Gerente</option><option value="atendente">Atendente</option>
+                <option value="super_admin">Super Admin</option><option value="gerente">Gerente</option><option value="profissional">Profissional</option><option value="atendente">Atendente</option>
               </select>
             </div>
             <div className="modal-actions">
@@ -101,7 +101,7 @@ export default function AdminUsers() {
             <div className="form-group"><label>Nova senha (deixe em branco para manter)</label><input className="input" type="password" value={editForm.password} onChange={e => setEditForm(p => ({ ...p, password: e.target.value }))} placeholder="••••••••" /></div>
             <div className="form-group"><label>Role</label>
               <select className="select" value={editForm.role} onChange={e => setEditForm(p => ({ ...p, role: e.target.value }))}>
-                <option value="super_admin">Super Admin</option><option value="gerente">Gerente</option><option value="atendente">Atendente</option>
+                <option value="super_admin">Super Admin</option><option value="gerente">Gerente</option><option value="profissional">Profissional</option><option value="atendente">Atendente</option>
               </select>
             </div>
             <div className="modal-actions">
