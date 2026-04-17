@@ -10,7 +10,7 @@ export default function Team() {
   const [users, setUsers] = useState<UserType[]>([])
   const [loading, setLoading] = useState(true)
   const [showNew, setShowNew] = useState(false)
-  const [newUser, setNewUser] = useState({ name: '', email: '', password: '' })
+  const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'atendente' })
   const [editingUser, setEditingUser] = useState<UserType | null>(null)
   const [editForm, setEditForm] = useState({ name: '', email: '', password: '' })
 
@@ -21,8 +21,8 @@ export default function Team() {
 
   const handleCreate = async () => {
     if (!newUser.name || !newUser.email || !newUser.password) return
-    await createUser({ ...newUser, role: 'atendente', account_id: accountId! })
-    setShowNew(false); setNewUser({ name: '', email: '', password: '' }); load()
+    await createUser({ ...newUser, role: newUser.role as any, account_id: accountId! })
+    setShowNew(false); setNewUser({ name: '', email: '', password: '', role: 'atendente' }); load()
   }
 
   const openEdit = (u: UserType) => { setEditingUser(u); setEditForm({ name: u.name, email: u.email, password: '' }) }
@@ -38,6 +38,7 @@ export default function Team() {
   const handleDelete = async (u: UserType) => { if (confirm(`Remover ${u.name}?`)) { await deleteUser(u.id); load() } }
 
   const atendentes = users.filter(u => u.role === 'atendente')
+  const profissionais = users.filter(u => u.role === 'profissional')
   const gerentes = users.filter(u => u.role === 'gerente')
 
   const renderUserRow = (u: UserType, canEdit: boolean) => (
@@ -63,7 +64,7 @@ export default function Team() {
     <div>
       <div className="page-header">
         <h1>Equipe</h1>
-        <button className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}><UserPlus size={14} /> Novo Atendente</button>
+        <button className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}><UserPlus size={14} /> Novo Usuario</button>
       </div>
 
       {loading ? <div className="loading-container"><div className="spinner" /></div> : (
@@ -74,6 +75,16 @@ export default function Team() {
               <div className="table-card"><table>
                 <thead><tr><th>Nome</th><th>Email</th><th>Status</th><th className="right">Acoes</th></tr></thead>
                 <tbody>{gerentes.map(u => renderUserRow(u, isAdmin))}</tbody>
+              </table></div>
+            </section>
+          )}
+
+          {profissionais.length > 0 && (
+            <section className="dash-section">
+              <div className="section-title">Profissionais ({profissionais.length})</div>
+              <div className="table-card"><table>
+                <thead><tr><th>Nome</th><th>Email</th><th>Status</th><th className="right">Acoes</th></tr></thead>
+                <tbody>{profissionais.map(u => renderUserRow(u, true))}</tbody>
               </table></div>
             </section>
           )}
@@ -94,10 +105,17 @@ export default function Team() {
       {showNew && (
         <div className="modal-overlay" onClick={() => setShowNew(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2>Novo Atendente</h2>
+            <h2>Novo Usuario</h2>
             <div className="form-group"><label>Nome</label><input className="input" value={newUser.name} onChange={e => setNewUser(p => ({ ...p, name: e.target.value }))} /></div>
             <div className="form-group"><label>Email</label><input className="input" type="email" value={newUser.email} onChange={e => setNewUser(p => ({ ...p, email: e.target.value }))} /></div>
             <div className="form-group"><label>Senha</label><input className="input" type="password" value={newUser.password} onChange={e => setNewUser(p => ({ ...p, password: e.target.value }))} /></div>
+            <div className="form-group"><label>Role</label>
+              <select className="select" value={newUser.role} onChange={e => setNewUser(p => ({ ...p, role: e.target.value }))}>
+                <option value="gerente">Gerente</option>
+                <option value="profissional">Profissional</option>
+                <option value="atendente">Atendente</option>
+              </select>
+            </div>
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={() => setShowNew(false)}>Cancelar</button>
               <button className="btn btn-primary" onClick={handleCreate}>Criar</button>
