@@ -70,8 +70,7 @@ async function processCadences() {
     // Auto-send DISABLED — all cadence messages are manual only (via Tasks/Chat button)
     // Just notify that the task is due
     broadcastSSE(row.account_id, 'task:due', { lead_cadence_id: row.id, lead_id: row.lead_id })
-      console.log(`[Scheduler] Task due: lead #${row.lead_id} attempt #${row.current_attempt_id} (${row.action_type})`)
-    }
+    console.log(`[Scheduler] Task due: lead #${row.lead_id} attempt #${row.current_attempt_id} (${row.action_type})`)
   }
 }
 
