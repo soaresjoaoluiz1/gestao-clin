@@ -72,6 +72,8 @@ export default function Agenda() {
   const { account } = useAccount()
   const { user } = useAuth()
   const isGerente = user?.role === 'gerente' || user?.role === 'super_admin'
+  const isAtendente = user?.role === 'atendente'
+  const canSeeAll = isGerente || isAtendente
 
   const [weekStart, setWeekStart] = useState<Date>(() => getMondayOf(new Date()))
   const [appointments, setAppointments] = useState<Appointment[]>([])
@@ -93,12 +95,12 @@ export default function Agenda() {
     fetchProfessionals(account.id).then(setProfessionals).catch(() => {})
   }, [account?.id])
 
-  // Set default filter for non-gerente
+  // Profissional only sees their own; gerente/atendente see all
   useEffect(() => {
-    if (!isGerente && user?.id) {
+    if (!canSeeAll && user?.id) {
       setFilterProfId(String(user.id))
     }
-  }, [isGerente, user?.id])
+  }, [canSeeAll, user?.id])
 
   const loadAppointments = useCallback(() => {
     if (!account?.id) return
@@ -126,7 +128,7 @@ export default function Agenda() {
 
   // Open create modal for a day
   const openCreate = (date: Date) => {
-    const defaultProfId = isGerente ? (professionals[0]?.id ? String(professionals[0].id) : '') : String(user?.id ?? '')
+    const defaultProfId = canSeeAll ? (professionals[0]?.id ? String(professionals[0].id) : '') : String(user?.id ?? '')
     setCreateModal({
       date: toISODate(date),
       patientName: '',
@@ -211,7 +213,7 @@ export default function Agenda() {
           <h1 style={{ fontSize: 20, fontWeight: 700, color: '#2D3748', margin: 0 }}>Agenda</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          {isGerente && (
+          {canSeeAll && (
             <select
               className="select"
               value={filterProfId}
@@ -382,7 +384,7 @@ export default function Agenda() {
               />
             </div>
 
-            {isGerente && (
+            {canSeeAll && (
               <div className="form-group">
                 <label style={{ fontSize: 13, fontWeight: 600, color: '#4A5568', marginBottom: 6, display: 'block' }}>Profissional</label>
                 <select
