@@ -69,7 +69,7 @@ interface DetailModalState {
 }
 
 export default function Agenda() {
-  const { account } = useAccount()
+  const { accountId } = useAccount()
   const { user } = useAuth()
   const isGerente = user?.role === 'gerente' || user?.role === 'super_admin'
   const isAtendente = user?.role === 'atendente'
@@ -91,9 +91,9 @@ export default function Agenda() {
 
   // Load professionals
   useEffect(() => {
-    if (!account?.id) return
-    fetchProfessionals(account.id).then(setProfessionals).catch(() => {})
-  }, [account?.id])
+    if (!accountId) return
+    fetchProfessionals(accountId).then(setProfessionals).catch(() => {})
+  }, [accountId])
 
   // Profissional only sees their own; gerente/atendente see all
   useEffect(() => {
@@ -103,15 +103,15 @@ export default function Agenda() {
   }, [canSeeAll, user?.id])
 
   const loadAppointments = useCallback(() => {
-    if (!account?.id) return
+    if (!accountId) return
     setLoading(true)
     const params: Record<string, string> = { date_from: weekFrom, date_to: weekTo }
     if (filterProfId) params.professional_id = filterProfId
-    fetchAppointments(account.id, params)
+    fetchAppointments(accountId, params)
       .then(setAppointments)
       .catch(() => setError('Erro ao carregar agendamentos'))
       .finally(() => setLoading(false))
-  }, [account?.id, weekFrom, weekTo, filterProfId])
+  }, [accountId, weekFrom, weekTo, filterProfId])
 
   useEffect(() => { loadAppointments() }, [loadAppointments])
 
@@ -143,15 +143,15 @@ export default function Agenda() {
 
   // Load slots when professional or date changes in modal
   const loadSlots = useCallback(async (profId: string, date: string) => {
-    if (!account?.id || !profId || !date) return
+    if (!accountId || !profId || !date) return
     setCreateModal(prev => prev ? { ...prev, loadingSlots: true, slot: '', slots: [] } : null)
     try {
-      const slots = await fetchSlots(account.id, Number(profId), date)
+      const slots = await fetchSlots(accountId, Number(profId), date)
       setCreateModal(prev => prev ? { ...prev, slots, loadingSlots: false } : null)
     } catch {
       setCreateModal(prev => prev ? { ...prev, loadingSlots: false } : null)
     }
-  }, [account?.id])
+  }, [accountId])
 
   useEffect(() => {
     if (createModal?.professionalId && createModal?.date) {
@@ -160,7 +160,7 @@ export default function Agenda() {
   }, [createModal?.professionalId, createModal?.date, loadSlots])
 
   const handleCreate = async () => {
-    if (!account?.id || !createModal) return
+    if (!accountId || !createModal) return
     if (!createModal.patientName.trim()) { setError('Informe o nome do paciente'); return }
     if (!createModal.professionalId) { setError('Selecione o profissional'); return }
     if (!createModal.slot) { setError('Selecione um horário'); return }
@@ -168,7 +168,7 @@ export default function Agenda() {
     setSaving(true)
     setError('')
     try {
-      await createAppointment(account.id, {
+      await createAppointment(accountId, {
         lead_id: 0, // backend resolves by name search; we pass name in notes or a separate field
         professional_id: Number(createModal.professionalId),
         date: createModal.date,
@@ -189,10 +189,10 @@ export default function Agenda() {
   }
 
   const handleStatusChange = async (apt: Appointment, status: string) => {
-    if (!account?.id) return
+    if (!accountId) return
     setSaving(true)
     try {
-      const updated = await updateAppointment(apt.id, account.id, { status })
+      const updated = await updateAppointment(apt.id, accountId, { status })
       setDetailModal({ appointment: updated })
       loadAppointments()
     } catch (e: any) {
