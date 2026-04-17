@@ -66,7 +66,7 @@ router.put('/:id', (req, res) => {
   if (role !== undefined && role !== user.role) {
     // Only super_admin can change roles; gerente cannot promote
     if (req.user.role !== 'super_admin') return res.status(403).json({ error: 'Apenas admin pode alterar role' })
-    if (!['super_admin', 'gerente', 'atendente'].includes(role)) return res.status(400).json({ error: 'Role invalido' })
+    if (!['super_admin', 'gerente', 'profissional', 'atendente'].includes(role)) return res.status(400).json({ error: 'Role invalido' })
     sets.push('role = ?'); params.push(role)
   }
   if (is_active !== undefined) { sets.push('is_active = ?'); params.push(is_active ? 1 : 0) }

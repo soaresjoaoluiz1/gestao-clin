@@ -218,3 +218,61 @@ export const createLaunch = (accountId: number, data: { title: string; identific
 export const updateLaunch = (id: number, accountId: number, data: Partial<Launch>) => apiFetch(`/api/launches/${id}?account_id=${accountId}`, { method: 'PUT', body: JSON.stringify(data) })
 export const updateLaunchMessages = (id: number, accountId: number, messages: Partial<LaunchMessage>[]) => apiFetch(`/api/launches/${id}/messages?account_id=${accountId}`, { method: 'PUT', body: JSON.stringify({ messages }) })
 export const deleteLaunch = (id: number, accountId: number) => apiFetch(`/api/launches/${id}?account_id=${accountId}`, { method: 'DELETE' })
+
+// =============================================
+// Appointments (Agenda)
+// =============================================
+
+export interface Appointment {
+  id: number; account_id: number; lead_id: number; professional_id: number
+  date: string; time_start: string; time_end: string; status: string; notes: string | null
+  lead_name: string | null; lead_phone: string | null; profile_pic_url: string | null
+  professional_name: string | null; created_at: string
+}
+export interface TimeSlot { time_start: string; time_end: string; available: boolean }
+export interface Professional { id: number; name: string; email: string; avatar_url: string | null }
+export interface ProfessionalSchedule { id: number; professional_id: number; day_of_week: number; time_start: string; time_end: string; slot_duration: number; is_active: number }
+
+export const fetchAppointments = (accountId: number, params: Record<string, string> = {}) => {
+  const qs = new URLSearchParams({ account_id: String(accountId), ...params }).toString()
+  return apiFetch<{ appointments: Appointment[] }>(`/api/appointments?${qs}`).then(d => d.appointments)
+}
+export const fetchSlots = (accountId: number, professionalId: number, date: string) =>
+  apiFetch<{ slots: TimeSlot[] }>(`/api/appointments/slots?account_id=${accountId}&professional_id=${professionalId}&date=${date}`).then(d => d.slots)
+export const createAppointment = (accountId: number, data: Partial<Appointment>) =>
+  apiFetch<{ appointment: Appointment }>(`/api/appointments?account_id=${accountId}`, { method: 'POST', body: JSON.stringify(data) }).then(d => d.appointment)
+export const updateAppointment = (id: number, accountId: number, data: Partial<Appointment>) =>
+  apiFetch<{ appointment: Appointment }>(`/api/appointments/${id}?account_id=${accountId}`, { method: 'PUT', body: JSON.stringify(data) }).then(d => d.appointment)
+export const deleteAppointment = (id: number, accountId: number) =>
+  apiFetch(`/api/appointments/${id}?account_id=${accountId}`, { method: 'DELETE' })
+export const fetchProfessionals = (accountId: number) =>
+  apiFetch<{ professionals: Professional[] }>(`/api/appointments/professionals?account_id=${accountId}`).then(d => d.professionals)
+export const fetchProfessionalSchedules = (professionalId: number, accountId: number) =>
+  apiFetch<{ schedules: ProfessionalSchedule[] }>(`/api/appointments/schedules/${professionalId}?account_id=${accountId}`).then(d => d.schedules)
+export const saveProfessionalSchedules = (professionalId: number, accountId: number, schedules: Partial<ProfessionalSchedule>[]) =>
+  apiFetch<{ schedules: ProfessionalSchedule[] }>(`/api/appointments/schedules/${professionalId}?account_id=${accountId}`, { method: 'PUT', body: JSON.stringify({ schedules }) }).then(d => d.schedules)
+
+// =============================================
+// Anamnese
+// =============================================
+
+export interface Anamnese {
+  id: number; account_id: number; lead_id: number; professional_id: number | null
+  chief_complaint: string | null; history: string | null; medications: string | null
+  allergies: string | null; notes: string | null; custom_fields: string | null
+  professional_name: string | null; lead_name: string | null; lead_phone: string | null
+  created_at: string; updated_at: string
+}
+
+export const fetchAnamneses = (accountId: number) =>
+  apiFetch<{ anamneses: Anamnese[] }>(`/api/anamneses?account_id=${accountId}`).then(d => d.anamneses)
+export const fetchLeadAnamneses = (leadId: number, accountId: number) =>
+  apiFetch<{ anamneses: Anamnese[] }>(`/api/anamneses/lead/${leadId}?account_id=${accountId}`).then(d => d.anamneses)
+export const fetchAnamnese = (id: number, accountId: number) =>
+  apiFetch<{ anamnese: Anamnese }>(`/api/anamneses/${id}?account_id=${accountId}`).then(d => d.anamnese)
+export const createAnamnese = (accountId: number, data: Partial<Anamnese>) =>
+  apiFetch<{ anamnese: Anamnese }>(`/api/anamneses?account_id=${accountId}`, { method: 'POST', body: JSON.stringify(data) }).then(d => d.anamnese)
+export const updateAnamnese = (id: number, accountId: number, data: Partial<Anamnese>) =>
+  apiFetch<{ anamnese: Anamnese }>(`/api/anamneses/${id}?account_id=${accountId}`, { method: 'PUT', body: JSON.stringify(data) }).then(d => d.anamnese)
+export const deleteAnamnese = (id: number, accountId: number) =>
+  apiFetch(`/api/anamneses/${id}?account_id=${accountId}`, { method: 'DELETE' })

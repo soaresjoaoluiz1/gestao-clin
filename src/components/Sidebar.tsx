@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Kanban, Users, MessageCircle, UserCog, GitBranch,
   Plug, Settings, Building2, LogOut, UsersRound, Menu, X,
   ListOrdered, MessageSquarePlus, ClipboardList, Rocket, ListTodo,
+  Calendar, FileText,
 } from 'lucide-react'
 
 export default function Sidebar() {
@@ -28,6 +29,7 @@ export default function Sidebar() {
 
   const isAdmin = user.role === 'super_admin'
   const isGerente = user.role === 'gerente'
+  const isProfissional = user.role === 'profissional'
 
   // Fetch new leads count (unassigned)
   useEffect(() => {
@@ -104,8 +106,16 @@ export default function Sidebar() {
             {newLeadsCount > 0 && <span className="nav-badge">{newLeadsCount > 99 ? '99+' : newLeadsCount}</span>}
           </NavLink>
           <NavLink to="/leads" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={closeMobile}>
-            <Users size={16} /> Leads
+            <Users size={16} /> Pacientes
           </NavLink>
+          <NavLink to="/agenda" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={closeMobile}>
+            <Calendar size={16} /> Agenda
+          </NavLink>
+          {(isGerente || isAdmin || isProfissional) && (
+            <NavLink to="/anamnese" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={closeMobile}>
+              <FileText size={16} /> Anamnese
+            </NavLink>
+          )}
 
           {(isGerente || isAdmin) && (
             <>
@@ -127,7 +137,7 @@ export default function Sidebar() {
         <div className="sidebar-footer">
           <div>
             <div className="sidebar-user">{user.name}</div>
-            <div className="sidebar-role">{user.role === 'super_admin' ? 'Admin' : user.role === 'gerente' ? 'Gerente' : 'Atendente'}</div>
+            <div className="sidebar-role">{user.role === 'super_admin' ? 'Admin' : user.role === 'gerente' ? 'Gerente' : user.role === 'profissional' ? 'Profissional' : 'Atendente'}</div>
           </div>
           <button className="logout-btn" onClick={logout} title="Sair"><LogOut size={16} /></button>
         </div>

@@ -19,6 +19,8 @@ import Cadences from './pages/Cadences'
 import ReadyMessages from './pages/ReadyMessages'
 import Qualifications from './pages/Qualifications'
 import Launches from './pages/Launches'
+import Agenda from './pages/Agenda'
+import AnamnesePage from './pages/Anamnese'
 import AdminClients from './pages/admin/Clients'
 import AdminClientDetail from './pages/admin/ClientDetail'
 import AdminGlobalDashboard from './pages/admin/GlobalDashboard'
@@ -32,7 +34,8 @@ function AppRoutes() {
 
   const isAdmin = user.role === 'super_admin'
   const isGerente = user.role === 'gerente'
-  const homeRoute = isAdmin ? '/admin/dashboard' : isGerente ? '/dashboard' : '/pipeline'
+  const isProfissional = user.role === 'profissional'
+  const homeRoute = isAdmin ? '/admin/dashboard' : isGerente ? '/dashboard' : isProfissional ? '/agenda' : '/pipeline'
 
   return (
     <AccountProvider>
@@ -72,6 +75,10 @@ function AppRoutes() {
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/leads/:id" element={<LeadDetail />} />
+          <Route path="/agenda" element={<Agenda />} />
+          {(isGerente || isAdmin || isProfissional) && (
+            <Route path="/anamnese" element={<AnamnesePage />} />
+          )}
 
           <Route path="*" element={<Navigate to={homeRoute} />} />
         </Routes>

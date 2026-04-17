@@ -24,14 +24,14 @@ db.exec(`
     updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
-  -- Users (super_admin, gerente, atendente)
+  -- Users (super_admin, gerente, profissional, atendente)
   CREATE TABLE IF NOT EXISTS users (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     account_id  INTEGER,
     name        TEXT NOT NULL,
     email       TEXT NOT NULL UNIQUE,
     password    TEXT NOT NULL,
-    role        TEXT NOT NULL CHECK (role IN ('super_admin', 'gerente', 'atendente')),
+    role        TEXT NOT NULL CHECK (role IN ('super_admin', 'gerente', 'profissional', 'atendente')),
     avatar_url  TEXT,
     is_active   INTEGER NOT NULL DEFAULT 1,
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
@@ -364,6 +364,57 @@ addColumnIfNotExists('leads', 'profile_pic_updated_at', 'TEXT')
 addColumnIfNotExists('leads', 'is_archived', 'INTEGER NOT NULL DEFAULT 0')
 addColumnIfNotExists('leads', 'archived_at', 'TEXT')
 addColumnIfNotExists('leads', 'has_new_after_archive', 'INTEGER NOT NULL DEFAULT 0')
+
+// ─── Gestão Clin: Consultas & Anamnese ─────────────────────────
+db.exec(`
+  CREATE TABLE IF NOT EXISTS appointments (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id      INTEGER NOT NULL,
+    lead_id         INTEGER NOT NULL,
+    professional_id INTEGER NOT NULL,
+    date            TEXT NOT NULL,
+    time_start      TEXT NOT NULL,
+    time_end        TEXT NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'confirmed', 'completed', 'cancelled', 'no_show')),
+    notes           TEXT,
+    created_by      INTEGER,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
+    FOREIGN KEY (professional_id) REFERENCES users(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
+  );
+  CREATE TABLE IF NOT EXISTS anamneses (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id      INTEGER NOT NULL,
+    lead_id         INTEGER NOT NULL,
+    professional_id INTEGER,
+    chief_complaint TEXT,
+    history         TEXT,
+    medications     TEXT,
+    allergies       TEXT,
+    notes           TEXT,
+    custom_fields   TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
+    FOREIGN KEY (professional_id) REFERENCES users(id)
+  );
+  CREATE TABLE IF NOT EXISTS professional_schedules (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    professional_id INTEGER NOT NULL,
+    account_id      INTEGER NOT NULL,
+    day_of_week     INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+    time_start      TEXT NOT NULL,
+    time_end        TEXT NOT NULL,
+    slot_duration   INTEGER NOT NULL DEFAULT 60,
+    is_active       INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (professional_id) REFERENCES users(id),
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
+  );
+`)
 
 // Seed super_admin if not exists
 const adminExists = db.prepare('SELECT id FROM users WHERE email = ?').get('admin@gestaoclin.com.br')
