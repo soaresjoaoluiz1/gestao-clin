@@ -43,9 +43,10 @@ app.use((req, res, next) => {
   next()
 })
 
-// Public routes
+// Public routes (no auth)
 app.use('/api/auth', authRoutes)
 app.use('/api/webhooks', webhookRoutes)
+app.use('/api/booking', (await import('./routes/public-booking.js')).default)
 
 // Protected routes (all require auth)
 app.use('/api/accounts', authenticate, accountRoutes)

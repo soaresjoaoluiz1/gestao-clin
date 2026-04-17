@@ -22,6 +22,7 @@ import Launches from './pages/Launches'
 import Agenda from './pages/Agenda'
 import AnamnesePage from './pages/Anamnese'
 import MeusHorarios from './pages/MeusHorarios'
+import Booking from './pages/Booking'
 import AdminClients from './pages/admin/Clients'
 import AdminClientDetail from './pages/admin/ClientDetail'
 import AdminGlobalDashboard from './pages/admin/GlobalDashboard'
@@ -96,9 +97,12 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <Routes>
+        {/* Public booking page — no auth, no sidebar */}
+        <Route path="/agendar/:slug" element={<Booking />} />
+        {/* All other routes go through auth */}
+        <Route path="*" element={<AuthProvider><AppRoutes /></AuthProvider>} />
+      </Routes>
     </BrowserRouter>
   )
 }
