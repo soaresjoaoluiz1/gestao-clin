@@ -124,7 +124,7 @@ export default function Leads() {
   return (
     <div>
       <div className="page-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><h1>Leads <span style={{ fontSize: 14, color: '#718096', fontWeight: 400 }}>({formatNumber(total)})</span></h1><AccountSelector /></div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}><h1>Pacientes <span style={{ fontSize: 14, color: '#718096', fontWeight: 400 }}>({formatNumber(total)})</span></h1><AccountSelector /></div>
         <div className="page-header-actions">
           <button
             className={`btn btn-sm ${showArchived ? 'btn-primary' : 'btn-secondary'}`}
