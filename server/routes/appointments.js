@@ -7,7 +7,7 @@ const router = Router()
 // List appointments (filtered by date range, professional)
 router.get('/', (req, res) => {
   if (!req.accountId) return res.status(400).json({ error: 'account_id required' })
-  const { date, week_start, week_end, professional_id } = req.query
+  const { date, week_start, week_end, date_from, date_to, professional_id } = req.query
 
   let where = 'a.account_id = ?'
   const params = [req.accountId]
@@ -27,6 +27,9 @@ router.get('/', (req, res) => {
   } else if (week_start && week_end) {
     where += ' AND a.date BETWEEN ? AND ?'
     params.push(week_start, week_end)
+  } else if (date_from && date_to) {
+    where += ' AND a.date BETWEEN ? AND ?'
+    params.push(date_from, date_to)
   }
 
   const appointments = db.prepare(`
@@ -91,10 +94,21 @@ router.get('/slots', (req, res) => {
 // Create appointment
 router.post('/', (req, res) => {
   if (!req.accountId) return res.status(400).json({ error: 'account_id required' })
-  const { lead_id, professional_id, date, time_start, time_end, notes } = req.body
-  if (!lead_id || !professional_id || !date || !time_start || !time_end) {
-    return res.status(400).json({ error: 'lead_id, professional_id, date, time_start, time_end required' })
+  let { lead_id, patient_name, professional_id, date, time_start, time_end, notes } = req.body
+  if (!professional_id || !date || !time_start || !time_end) {
+    return res.status(400).json({ error: 'professional_id, date, time_start, time_end required' })
   }
+
+  // If patient_name provided instead of lead_id, search or create lead
+  if (!lead_id && patient_name) {
+    let lead = db.prepare('SELECT id FROM leads WHERE account_id = ? AND name LIKE ? LIMIT 1').get(req.accountId, `%${patient_name}%`)
+    if (!lead) {
+      const r = db.prepare('INSERT INTO leads (account_id, name, source) VALUES (?, ?, ?)').run(req.accountId, patient_name, 'consulta')
+      lead = { id: r.lastInsertRowid }
+    }
+    lead_id = lead.id
+  }
+  if (!lead_id) return res.status(400).json({ error: 'lead_id ou patient_name required' })
 
   // Check for conflicts
   const conflict = db.prepare(`

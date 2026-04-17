@@ -116,6 +116,11 @@ export default function Sidebar() {
               <FileText size={16} /> Anamnese
             </NavLink>
           )}
+          {isProfissional && (
+            <NavLink to="/meus-horarios" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={closeMobile}>
+              <Clock size={16} /> Meus Horários
+            </NavLink>
+          )}
 
           {(isGerente || isAdmin) && (
             <>

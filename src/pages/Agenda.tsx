@@ -71,7 +71,7 @@ interface DetailModalState {
 export default function Agenda() {
   const { account } = useAccount()
   const { user } = useAuth()
-  const isGerente = user?.role === 'gerente' || user?.role === 'admin'
+  const isGerente = user?.role === 'gerente' || user?.role === 'super_admin'
 
   const [weekStart, setWeekStart] = useState<Date>(() => getMondayOf(new Date()))
   const [appointments, setAppointments] = useState<Appointment[]>([])

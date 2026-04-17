@@ -21,6 +21,7 @@ import Qualifications from './pages/Qualifications'
 import Launches from './pages/Launches'
 import Agenda from './pages/Agenda'
 import AnamnesePage from './pages/Anamnese'
+import MeusHorarios from './pages/MeusHorarios'
 import AdminClients from './pages/admin/Clients'
 import AdminClientDetail from './pages/admin/ClientDetail'
 import AdminGlobalDashboard from './pages/admin/GlobalDashboard'
@@ -78,6 +79,9 @@ function AppRoutes() {
           <Route path="/agenda" element={<Agenda />} />
           {(isGerente || isAdmin || isProfissional) && (
             <Route path="/anamnese" element={<AnamnesePage />} />
+          )}
+          {isProfissional && (
+            <Route path="/meus-horarios" element={<MeusHorarios />} />
           )}
 
           <Route path="*" element={<Navigate to={homeRoute} />} />
