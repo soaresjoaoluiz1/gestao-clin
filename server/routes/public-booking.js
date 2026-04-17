@@ -53,7 +53,7 @@ router.delete('/links/:id', (req, res) => {
 // ══════════════════════════════════════════════
 
 // Get booking info by token (public)
-router.get('/t/:token', (req, res) => {
+router.get('/:token', (req, res) => {
   const link = db.prepare(`
     SELECT bl.*, l.name as lead_name, u.name as professional_name, a.name as clinic_name
     FROM booking_links bl
@@ -76,7 +76,7 @@ router.get('/t/:token', (req, res) => {
 })
 
 // Get slots for booking link (public)
-router.get('/t/:token/slots', (req, res) => {
+router.get('/:token/slots', (req, res) => {
   const link = db.prepare('SELECT * FROM booking_links WHERE token = ? AND status = ?').get(req.params.token, 'active')
   if (!link) return res.status(404).json({ error: 'Link invalido' })
 
@@ -119,7 +119,7 @@ router.get('/t/:token/slots', (req, res) => {
 })
 
 // Book appointment via token (public)
-router.post('/t/:token/book', (req, res) => {
+router.post('/:token/book', (req, res) => {
   const link = db.prepare('SELECT * FROM booking_links WHERE token = ? AND status = ?').get(req.params.token, 'active')
   if (!link) return res.status(404).json({ error: 'Link invalido ou ja utilizado' })
 
