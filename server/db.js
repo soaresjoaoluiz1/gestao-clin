@@ -431,6 +431,23 @@ db.exec(`
     FOREIGN KEY (created_by) REFERENCES users(id),
     FOREIGN KEY (appointment_id) REFERENCES appointments(id)
   );
+  CREATE TABLE IF NOT EXISTS standalone_tasks (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id      INTEGER NOT NULL,
+    lead_id         INTEGER,
+    assigned_to     INTEGER,
+    title           TEXT NOT NULL,
+    description     TEXT,
+    due_datetime    TEXT NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed')),
+    created_by      INTEGER,
+    completed_at    TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE,
+    FOREIGN KEY (lead_id) REFERENCES leads(id),
+    FOREIGN KEY (assigned_to) REFERENCES users(id),
+    FOREIGN KEY (created_by) REFERENCES users(id)
+  );
 `)
 
 // Seed super_admin if not exists
