@@ -6,13 +6,13 @@ import {
   fetchWhatsAppInstances, fetchLeads, fetchLead, fetchFunnels, fetchUsers, fetchTags,
   sendMessage, updateLead, moveLeadStage, assignLead, addLeadNote, addLeadTag, removeLeadTag,
   fetchLeadCadence, advanceLeadCadence, fetchCadences, assignLeadCadence, createTag,
-  archiveLead,
+  archiveLead, apiFetch, fetchProfessionals, type Professional,
   type WhatsAppInstance, type Lead, type Message, type StageHistoryEntry, type LeadNote,
   type Funnel, type User as UserType, type Tag, type LeadCadence, type Cadence,
 } from '../lib/api'
 import {
   MessageCircle, Search, Send, Phone, User, Edit3, Save, X, Plus,
-  StickyNote, Tag as TagIcon, GitBranch, Smartphone, ListOrdered, ChevronRight, Check, Clock, Archive,
+  StickyNote, Tag as TagIcon, GitBranch, Smartphone, ListOrdered, ChevronRight, Check, Clock, Archive, Link, Copy,
 } from 'lucide-react'
 import MessageMedia from '../components/MessageMedia'
 
@@ -53,6 +53,11 @@ export default function Chat() {
   const [showTagMenu, setShowTagMenu] = useState(false)
   const [newTagName, setNewTagName] = useState('')
   const [newTagColor, setNewTagColor] = useState('#5CB8B2')
+  const [professionals, setProfessionals] = useState<Professional[]>([])
+  const [bookingProfId, setBookingProfId] = useState('')
+  const [bookingLink, setBookingLink] = useState('')
+  const [bookingCopied, setBookingCopied] = useState(false)
+  const [generatingLink, setGeneratingLink] = useState(false)
   const chatEndRef = useRef<HTMLDivElement>(null)
 
   // Load instances + globals
@@ -63,6 +68,7 @@ export default function Chat() {
     fetchUsers(accountId).then(setUsers)
     fetchTags(accountId).then(setTags)
     fetchCadences(accountId).then(setCadences)
+    fetchProfessionals(accountId).then(setProfessionals)
   }, [accountId])
 
   // Load leads list (with optional instance filter)
@@ -434,6 +440,44 @@ export default function Chat() {
                       </>
                     ) : (
                       <div style={{ fontSize: 11, color: '#A0AEC0' }}>Nenhuma cadencia atribuida</div>
+                    )}
+                  </div>
+
+                  {/* Booking Link */}
+                  <div className="card" style={{ padding: 12, marginTop: 12 }}>
+                    <div style={{ fontSize: 10, color: '#718096', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 3, marginBottom: 6 }}><Link size={10} /> Link de Agendamento</div>
+                    {bookingLink ? (
+                      <div>
+                        <div style={{ fontSize: 11, color: '#48BB78', marginBottom: 6 }}>Link gerado com sucesso!</div>
+                        <div style={{ display: 'flex', gap: 4 }}>
+                          <input className="input" value={bookingLink} readOnly style={{ fontSize: 10, padding: '6px 8px' }} />
+                          <button className="btn btn-secondary btn-sm btn-icon" onClick={() => { navigator.clipboard.writeText(bookingLink); setBookingCopied(true); setTimeout(() => setBookingCopied(false), 2000) }} title="Copiar">
+                            {bookingCopied ? <Check size={12} style={{ color: '#48BB78' }} /> : <Copy size={12} />}
+                          </button>
+                        </div>
+                        <button className="btn btn-primary btn-sm" style={{ width: '100%', fontSize: 11, marginTop: 6 }} onClick={() => { setMsgText(bookingLink); setBookingLink('') }}>
+                          <Send size={10} /> Enviar no chat
+                        </button>
+                      </div>
+                    ) : (
+                      <div>
+                        <select className="select" value={bookingProfId} onChange={e => setBookingProfId(e.target.value)} style={{ fontSize: 11, marginBottom: 6 }}>
+                          <option value="">Selecionar profissional</option>
+                          {professionals.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                        </select>
+                        <button className="btn btn-primary btn-sm" style={{ width: '100%', fontSize: 11 }} disabled={!bookingProfId || generatingLink} onClick={async () => {
+                          if (!accountId || !lead || !bookingProfId) return
+                          setGeneratingLink(true)
+                          try {
+                            const data = await apiFetch<{ token: string }>(`/api/booking/generate?account_id=${accountId}`, { method: 'POST', body: JSON.stringify({ lead_id: lead.id, professional_id: parseInt(bookingProfId) }) })
+                            const url = `${window.location.origin}${import.meta.env.BASE_URL}agendar/${data.token}`
+                            setBookingLink(url)
+                          } catch (e: any) { alert('Erro: ' + (e?.message || 'desconhecido')) }
+                          setGeneratingLink(false)
+                        }}>
+                          <Link size={10} /> {generatingLink ? 'Gerando...' : 'Gerar Link'}
+                        </button>
+                      </div>
                     )}
                   </div>
 
