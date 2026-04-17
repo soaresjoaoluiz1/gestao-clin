@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Kanban, Users, MessageCircle, UserCog, GitBranch,
   Plug, Settings, Building2, LogOut, UsersRound, Menu, X,
   ListOrdered, MessageSquarePlus, ClipboardList, Rocket, ListTodo,
-  Calendar, FileText,
+  Calendar, FileText, Clock,
 } from 'lucide-react'
 
 export default function Sidebar() {
