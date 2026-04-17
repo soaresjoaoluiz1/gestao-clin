@@ -54,38 +54,40 @@ router.get('/slots', (req, res) => {
   const d = new Date(date + 'T00:00:00')
   const dayOfWeek = d.getDay()
 
-  // Get professional's schedule for this day of week
-  const schedule = db.prepare(
-    'SELECT * FROM professional_schedules WHERE professional_id = ? AND account_id = ? AND day_of_week = ? AND is_active = 1'
-  ).get(parseInt(professional_id), req.accountId, dayOfWeek)
+  // Get professional's schedules for this day (multiple turnos per day)
+  const schedules = db.prepare(
+    'SELECT * FROM professional_schedules WHERE professional_id = ? AND account_id = ? AND day_of_week = ? AND is_active = 1 ORDER BY time_start'
+  ).all(parseInt(professional_id), req.accountId, dayOfWeek)
 
-  if (!schedule) return res.json({ slots: [], message: 'Profissional nao atende neste dia' })
+  if (!schedules.length) return res.json({ slots: [], message: 'Profissional nao atende neste dia' })
 
   // Get existing appointments
   const existing = db.prepare(
     "SELECT time_start, time_end FROM appointments WHERE professional_id = ? AND date = ? AND status != 'cancelled'"
   ).all(parseInt(professional_id), date)
 
-  // Generate slots
+  // Generate slots from all turnos
   const slots = []
-  const [startH, startM] = schedule.time_start.split(':').map(Number)
-  const [endH, endM] = schedule.time_end.split(':').map(Number)
-  const duration = schedule.slot_duration || 60
-  let current = startH * 60 + startM
-  const end = endH * 60 + endM
+  for (const schedule of schedules) {
+    const [startH, startM] = schedule.time_start.split(':').map(Number)
+    const [endH, endM] = schedule.time_end.split(':').map(Number)
+    const duration = schedule.slot_duration || 60
+    let current = startH * 60 + startM
+    const end = endH * 60 + endM
 
-  while (current + duration <= end) {
-    const slotStart = `${String(Math.floor(current / 60)).padStart(2, '0')}:${String(current % 60).padStart(2, '0')}`
-    const slotEnd = `${String(Math.floor((current + duration) / 60)).padStart(2, '0')}:${String((current + duration) % 60).padStart(2, '0')}`
+    while (current + duration <= end) {
+      const slotStart = `${String(Math.floor(current / 60)).padStart(2, '0')}:${String(current % 60).padStart(2, '0')}`
+      const slotEnd = `${String(Math.floor((current + duration) / 60)).padStart(2, '0')}:${String((current + duration) % 60).padStart(2, '0')}`
 
-    const isBooked = existing.some(e => {
-      const eStart = e.time_start.slice(0, 5)
-      const eEnd = e.time_end.slice(0, 5)
-      return slotStart < eEnd && slotEnd > eStart
-    })
+      const isBooked = existing.some(e => {
+        const eStart = e.time_start.slice(0, 5)
+        const eEnd = e.time_end.slice(0, 5)
+        return slotStart < eEnd && slotEnd > eStart
+      })
 
-    slots.push({ time_start: slotStart, time_end: slotEnd, available: !isBooked })
-    current += duration
+      slots.push({ time_start: slotStart, time_end: slotEnd, available: !isBooked })
+      current += duration
+    }
   }
 
   res.json({ slots })
