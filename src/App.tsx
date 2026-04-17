@@ -94,15 +94,19 @@ function AppRoutes() {
   )
 }
 
+function RootRouter() {
+  // Check if current path is public booking — render without auth
+  const path = window.location.pathname.replace(import.meta.env.BASE_URL.replace(/\/$/, ''), '')
+  if (path.startsWith('/agendar/') || path.startsWith('/agendar')) {
+    return <Routes><Route path="/agendar/:slug" element={<Booking />} /></Routes>
+  }
+  return <AuthProvider><AppRoutes /></AuthProvider>
+}
+
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <Routes>
-        {/* Public booking page — no auth, no sidebar */}
-        <Route path="/agendar/:slug" element={<Booking />} />
-        {/* All other routes go through auth */}
-        <Route path="*" element={<AuthProvider><AppRoutes /></AuthProvider>} />
-      </Routes>
+      <RootRouter />
     </BrowserRouter>
   )
 }
