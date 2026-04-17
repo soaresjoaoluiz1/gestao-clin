@@ -26,6 +26,7 @@ import launchRoutes from './routes/launches.js'
 import taskRoutes from './routes/tasks.js'
 import appointmentRoutes from './routes/appointments.js'
 import anamneseRoutes from './routes/anamneses.js'
+import bookingRoutes from './routes/public-booking.js'
 import { authenticate, scopeToAccount } from './middleware/auth.js'
 import { addSSEClient, removeSSEClient } from './sse.js'
 import { startScheduler } from './scheduler.js'
@@ -46,7 +47,7 @@ app.use((req, res, next) => {
 // Public routes (no auth)
 app.use('/api/auth', authRoutes)
 app.use('/api/webhooks', webhookRoutes)
-app.use('/api/booking', (await import('./routes/public-booking.js')).default)
+app.use('/api/booking', bookingRoutes)
 
 // Protected routes (all require auth)
 app.use('/api/accounts', authenticate, accountRoutes)
