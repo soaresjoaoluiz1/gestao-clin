@@ -26,7 +26,7 @@ export default function GlobalDashboard() {
       <section className="dash-section">
         <div className="section-title">Contas</div>
         <div className="table-card"><table>
-          <thead><tr><th>Cliente</th><th className="right">Total Leads</th><th className="right">Leads Hoje</th><th className="right">Atendentes</th></tr></thead>
+          <thead><tr><th>Consultorio</th><th className="right">Total Leads</th><th className="right">Leads Hoje</th><th className="right">Atendentes</th></tr></thead>
           <tbody>
             {data.accounts.map((a: any) => (
               <tr key={a.id}><td className="name">{a.name}</td><td className="right" style={{ fontWeight: 600 }}>{formatNumber(a.total_leads)}</td><td className="right">{a.leads_today}</td><td className="right">{a.attendants}</td></tr>

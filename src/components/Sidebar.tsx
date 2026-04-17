@@ -80,7 +80,7 @@ export default function Sidebar() {
                 <LayoutDashboard size={16} /> Dashboard Global
               </NavLink>
               <NavLink to="/admin/clients" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={closeMobile}>
-                <Building2 size={16} /> Clientes
+                <Building2 size={16} /> Consultorios
               </NavLink>
               <NavLink to="/admin/users" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`} onClick={closeMobile}>
                 <UsersRound size={16} /> Usuarios

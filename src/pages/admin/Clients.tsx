@@ -22,7 +22,7 @@ export default function Clients() {
   return (
     <div>
       <div className="page-header">
-        <h1><Building2 size={20} style={{ marginRight: 8 }} /> Clientes</h1>
+        <h1><Building2 size={20} style={{ marginRight: 8 }} /> Consultorios</h1>
         <button className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}><Plus size={14} /> Nova Conta</button>
       </div>
 
@@ -49,7 +49,7 @@ export default function Clients() {
         <div className="modal-overlay" onClick={() => setShowNew(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h2>Nova Conta</h2>
-            <div className="form-group"><label>Nome do Cliente</label><input className="input" value={newName} onChange={e => setNewName(e.target.value)} placeholder="Ex: BG Imoveis" /></div>
+            <div className="form-group"><label>Nome do Consultorio</label><input className="input" value={newName} onChange={e => setNewName(e.target.value)} placeholder="Ex: Espaco Taina Cristina" /></div>
             <p style={{ fontSize: 11, color: '#718096', marginTop: 8 }}>Um funil padrao sera criado automaticamente.</p>
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={() => setShowNew(false)}>Cancelar</button>
